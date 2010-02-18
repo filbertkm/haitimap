@@ -66,3 +66,7 @@ h5 {
    color: #fff;
    text-decoration: none;
 }
+
+.x-panel-btns {
+   padding: .1em 1em;
+}

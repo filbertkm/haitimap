@@ -21,6 +21,7 @@ filename = operator.concat(layer, '.shp')
 outbbox = string.replace(bbox, ' ', '_')
 newfile = operator.concat(layer, outbbox)
 newfile = operator.concat(newfile, '.shp')
+newzip = string.replace(newfile, '.shp', '.zip')
 
 infile = operator.concat(datadir, filename)
 outfile = operator.concat(datadir, newfile)
@@ -32,11 +33,20 @@ command = operator.concat(command, " ")
 command = operator.concat(command, infile)
 
 os.system(command)
+os.chdir(datadir)
+
+zipcommand = operator.concat("/usr/bin/zip -rD ", newzip)
+zipcommand = operator.concat(zipcommand, " ")
+zipcommand = operator.concat(zipcommand, layer)
+zipcommand = operator.concat(zipcommand, ".*")
+
+os.system(zipcommand)
 
 downloadlink = "http://haitimapguide.org/map/data/"
 downloadlink = operator.concat(downloadlink, newfile)
+downloadlink = string.replace(downloadlink, '.shp', '.zip')
 
-output = "<h2>Haiti Map Data</h2><p>Your download is ready:</p><p><a href='"
+output = "<p>Your download is ready:</p><p><a href='"
 output = operator.concat(output, downloadlink)
 output = operator.concat(output, "'>")
 output = operator.concat(output, downloadlink)
