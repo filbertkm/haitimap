@@ -67,6 +67,10 @@ h5 {
    text-decoration: none;
 }
 
+#downloadlink {
+   font-size:100%;
+}
+
 .x-panel-btns {
    padding: .1em 1em;
 }
