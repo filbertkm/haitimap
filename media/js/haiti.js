@@ -77,31 +77,42 @@ Layout = {
 	});
 
 	var downloadForm = [{
-		bodyStyle: 'padding:.3em .6em .3em .6em;',
+		bodyStyle: 'padding:.3em .6em .3em .3em;',
 		border: false,
 		items: [{
 			xtype: 'fieldset',
 			title: '',
-			autoHeight: true,
-			border: false,
 			labelWidth: 20,
-			defaultType: 'checkbox',
-			bodyStyle: 'padding-top: .2m;',
-			items: [{
-				boxLabel: 'Buildings',
-				name: 'buildings-data'
-			}, {
-				boxLabel: 'Natural',
-				name: 'natural-data'
-			}, {
-				boxLabel: 'Places',
-				name: 'places-data'
-			}, {
-				boxLabel: 'Roads',
-				name: 'roads-data'			
-			}, {
-				boxLabel: 'Waterways',
-				name: 'waterways-data'
+			border: false,
+			items: 
+			[{
+				xtype: 'radiogroup',
+				itemCls: 'x-radio-group-alt',
+				columns: 1,
+				title: '',
+				border: false,
+				bodyStyle: 'padding-top: .2m;',
+				items: [{
+					boxLabel: 'Buildings',
+					name: 'buildings-data',
+					inputValue: 1
+				}, {
+					boxLabel: 'Natural',
+					name: 'natural-data',
+					inputValue: 2
+				}, {
+					boxLabel: 'Places',
+					name: 'places-data',
+					inputValue: 3
+				}, {
+					boxLabel: 'Roads',
+					name: 'roads-data',
+					inputValue: 4
+				}, {
+					boxLabel: 'Waterways',
+					name: 'waterways-data',
+					inputValue: 5
+				}]
 			}]
 		}],
 		buttons: [{
