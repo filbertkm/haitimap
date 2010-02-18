@@ -77,17 +77,19 @@ Layout = {
 	});
 
 	var downloadForm = [{
+		id: 'downloadform',
 		bodyStyle: 'padding:.3em .6em .3em .3em;',
 		border: false,
 		items: [{
 			xtype: 'fieldset',
 			title: '',
+			id: 'downloadfield',
 			labelWidth: 20,
 			border: false,
 			items: 
 			[{
 				xtype: 'radiogroup',
-				itemCls: 'x-radio-group-alt',
+				id: 'downloadgroup',
 				columns: 1,
 				width: 150,
 				title: '',
@@ -96,30 +98,49 @@ Layout = {
 				items: [{
 					boxLabel: 'Buildings',
 					name: 'datalayer',
-					inputValue: 1
+					inputValue: 'buildings'
 				}, {
 					boxLabel: 'Natural',
 					name: 'datalayer',
-					inputValue: 2
+					inputValue: 'natural'
 				}, {
 					boxLabel: 'Places',
 					name: 'datalayer',
-					inputValue: 3
+					inputValue: 'places'
 				}, {
 					boxLabel: 'Roads',
 					name: 'datalayer',
-					inputValue: 4
+					inputValue: 'roads'
 				}, {
 					boxLabel: 'Waterways',
 					name: 'datalayer',
-					inputValue: 5
+					inputValue: 'waterways'
 				}]
 			}]
 		}],
 		buttons: [{
 			text: 'Select',
 			handler: function() {
-				alert('select');
+				var bounds = Haiti.map.getExtent().transform(
+					new OpenLayers.Projection("EPSG:900913"),					
+					new OpenLayers.Projection("EPSG:4326")
+				).toBBOX();
+				var layerName = Ext.getCmp('downloadgroup').getValue().inputValue;
+				var request = OpenLayers.Request.GET({
+					url: "http://www.haitimapguide.org/cgi-bin/download.cgi?layer=",
+					params: { bbox: bounds, layer: layerName },
+					success: function(request) {
+						resultPanel = new Ext.Panel({
+							id: 'requestResults',
+							html : request.responseText,
+							title : ''
+						});
+						Layout.sidebar.add(resultPanel);
+					},
+					failure: function(request) {
+					}
+				});
+				var xmlhttp = OpenLayers.Request.issue(request);	
 			}
 		}]
 	}];
