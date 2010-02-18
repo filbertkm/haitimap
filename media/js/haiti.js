@@ -28,43 +28,68 @@ Layout = {
 	});
 	this.main.add(mapPanel);
 
-	var haitiStore = new GeoExt.data.LayerStore({
-		map: Haiti.map,
-		layers: Haiti.map.layers
+	var download = new DownloadControl();
+	var layerToolbar = new Ext.Toolbar({
+		items: [
+			new GeoExt.Action({
+				text: 'Download',
+				control: download,
+				map: Haiti.map,
+				toggleGroup: "draw",
+				allowDepress: true,
+				tooltip: "Download data",
+				group: "draw"
+			})
+		]
 	});
 
-	var legend = new GeoExt.LegendPanel({
-		renderTo: 'sidebar',
-		bodyStyle: 'padding:.5em;background:#eee;',
-		layerStore: haitiStore
-	});
-	this.sidebar.add(legend);
-
-/*
 	var layerRoot = new Ext.tree.TreeNode({
-		text: "All Layers",
-		expanded: true
+	    text: "All Layers",
+	    expanded: true
 	});
-	var layer_groups = [];
-
 	layerRoot.appendChild(new GeoExt.tree.BaseLayerContainer({
-		text: 'Base Layers',
-		map: map,
-		draggable: false,
-		expanded: true
+	    text: "Base Layers",
+	    map: this.map,
+	    draggable: false,
+	    expanded: true
 	}));
 
-	var layerTree = new Ext.tree.TreePanel({
-		title: '',
-		id: 'map_lt',
-		enableDD: true,
-		root: layerRoot,
-		rootVisible: true,
-		autoScroll: true
-	});
+	var layer_groups = Haiti.layer_groups;
 
+	for (var i=0; i<layer_groups.length; i+=1) {
+		var myStore = new GeoExt.data.LayerStore({
+			map: Haiti.map,
+			initDir: GeoExt.data.LayerStore.MAP_TO_STORE|GeoExt.data.LayerStore.STORE_TO_MAP,
+			layers: layer_groups[i]["layers"]
+		});
+ 		layerRoot.appendChild(new GeoExt.tree.LayerContainer({
+		    text: layer_groups[i]["name"],
+		    layerStore: myStore,
+	            draggable: false,
+		    expanded: true,
+	            loader: new GeoExt.tree.LayerLoader({
+			layers: layer_groups[i]["layers"],
+			filter: function(record) {
+				var layer = record.get("layer");
+				var layers = this.layers;
+				return (!layer.isBaseLayer);
+			}
+		    })
+		}));
+	}
+
+        var layerTree = new Ext.tree.TreePanel({
+            title: '',
+            id: 'map_lt',
+            enableDD: true,
+            root: layerRoot,
+            rootVisible: false,
+            autoScroll: true,
+            border: false,
+	    tbar: layerToolbar
+        });
 	this.sidebar.add(layerTree);
-*/
+
         this.viewport = new Ext.Viewport({
             layout: 'border',
             items: [
@@ -79,7 +104,7 @@ Layout = {
         region: 'south',
         el: 'footer',
         bodyStyle: 'background: #3D3D53;border:none;',
-        html: '<a href="/about/">About</a> | <a href="/contact/">Contact</a>'
+        html: '<a href="about.html">About</a> | <a href="contact.html">Contact</a>'
     }),
     header: new Ext.Panel({
         region: 'north',
@@ -108,19 +133,19 @@ Layout = {
 Ext.onReady(function() {
 
     OpenLayers.IMAGE_RELOAD_ATTEMPTS = 2;
-    OpenLayers.ProxyHost = "proxy.cgi?url=";
+    OpenLayers.ProxyHost = "http://haitimapguide.org/cgi-bin/proxy.cgi?url=";
 
     var options = {
         units: 'm',
         maxResolution: 156543.0339,
-        numZoomLevels: 18,
+        numZoomLevels: 20,
         projection: new OpenLayers.Projection("EPSG:900913"),
         displayProjection: new OpenLayers.Projection("EPSG:4326"),
         maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34),
     	controls: [
+		new OpenLayers.Control.Navigation(),
 		new OpenLayers.Control.Scale(),
 		new OpenLayers.Control.PanZoomBar(),
-		new OpenLayers.Control.LayerSwitcher(),
 		new OpenLayers.Control.Attribution()
 	]
     };
@@ -139,19 +164,62 @@ Ext.onReady(function() {
         }
     );
 
-    var wfsLayer = new OpenLayers.Layer.WFS( 
-	"Roads",
-	"http://portal.cubewerx.com/cubewerx/cubeserv/cubeserv.cgi",
-	{ typename: "cw:PLACES" }
-    );
+    var vector_layers = [];
 
-    var states = new OpenLayers.Layer.WFS( 
-	"States",
-	"http://sigma.openplans.org/geoserver/ows",
-	{ typename: 'topp:states' } 
+    var places = new OpenLayers.Layer.WFS(
+	"Places",
+	"http://portal.cubewerx.com/cubewerx/cubeserv/cubeserv.cgi?CONFIG=haiti_vgi&DATASTORE=vgi&",
+	{ typename: 'cw:PLACES' },
+	{
+		typename: 'PLACES',
+		projection: new OpenLayers.Projection("EPSG:4326"),
+		styleMap: new OpenLayers.StyleMap(OpenLayers.Util.applyDefaults(
+			{
+				fillOpacity: 1,
+				fillColor: "blue",
+				pointRadius: 4 
+			},
+			OpenLayers.Feature.Vector.style["default"])
+		)	
+	}
     );
+    vector_layers.push(places);
 
-    map.addLayers([osm, haiti_best, states]);
+    var roads = new OpenLayers.Layer.WFS(
+        "Roads",
+        "http://portal.cubewerx.com/cubewerx/cubeserv/cubeserv.cgi?CONFIG=haiti_vgi&DATASTORE=vgi&",
+        { typename: 'cw:ROADS' },
+        {
+                typename: 'ROADS',
+                projection: new OpenLayers.Projection("EPSG:4326"),
+        }
+    );
+    vector_layers.push(roads);
+
+    var hospitals = new OpenLayers.Layer.WFS(
+        "Hospitals",
+        "http://portal.cubewerx.com/cubewerx/cubeserv/cubeserv.cgi?CONFIG=haiti_vgi&DATASTORE=vgi&",
+        { typename: 'cw:EmergencyMedicalCenter' },
+        {
+                typename: 'EmergencyMedicalCenter',
+                projection: new OpenLayers.Projection("EPSG:4326"),
+                styleMap: new OpenLayers.StyleMap(OpenLayers.Util.applyDefaults(
+                        {
+                                fillOpacity: 1,
+                                fillColor: "red",
+                                pointRadius: 4
+                        },
+                        OpenLayers.Feature.Vector.style["default"])
+                )
+        }
+    );
+    vector_layers.push(hospitals);
+    
+    var layer_groups = [];
+    layer_groups.push({ name: 'Vector', layers: vector_layers, expanded: true });
+    Haiti.layer_groups = layer_groups;
+
+    map.addLayers([osm, haiti_best]);
 
     Layout.setup();
 });

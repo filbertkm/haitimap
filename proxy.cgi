@@ -15,10 +15,10 @@ import sys, os
 
 # Designed to prevent Open Proxy type stuff.
 
-allowedHosts = ['www.openlayers.org', 'openlayers.org', 
-                'labs.metacarta.com', 'world.freemap.in', 
+allowedHosts = ['geoserver.firststrike.net','www.openlayers.org', 
+		'openlayers.org', 'labs.metacarta.com', 'world.freemap.in', 
                 'prototype.openmnnd.org', 'geo.openplans.org',
-                'sigma.openplans.org', 'demo.opengeo.org',
+                'sigma.openplans.org', 'demo.opengeo.org', 'portal.cubewerx.com', 
                 'www.openstreetmap.org', 'sample.avencia.com',
                 'v-swe.uni-muenster.de:8080', 'local.yahooapis.com',
                 'ispatial.t-sciences.com','haiti.sahanafoundation.org',
