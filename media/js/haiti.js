@@ -89,28 +89,29 @@ Layout = {
 				xtype: 'radiogroup',
 				itemCls: 'x-radio-group-alt',
 				columns: 1,
+				width: 150,
 				title: '',
 				border: false,
 				bodyStyle: 'padding-top: .2m;',
 				items: [{
 					boxLabel: 'Buildings',
-					name: 'buildings-data',
+					name: 'datalayer',
 					inputValue: 1
 				}, {
 					boxLabel: 'Natural',
-					name: 'natural-data',
+					name: 'datalayer',
 					inputValue: 2
 				}, {
 					boxLabel: 'Places',
-					name: 'places-data',
+					name: 'datalayer',
 					inputValue: 3
 				}, {
 					boxLabel: 'Roads',
-					name: 'roads-data',
+					name: 'datalayer',
 					inputValue: 4
 				}, {
 					boxLabel: 'Waterways',
-					name: 'waterways-data',
+					name: 'datalayer',
 					inputValue: 5
 				}]
 			}]
@@ -140,7 +141,7 @@ Layout = {
             enableDD: true,
             root: layerRoot,
             rootVisible: false,
-            autoScroll: true,
+            autoScroll: false,
             border: false,
 	    bodyStyle: 'margin-bottom: 1em;'
 //	    tbar: layerToolbar
